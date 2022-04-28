@@ -1,7 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 
-export let loader: LoaderFunction = () => {
+export const loader: LoaderFunction = () => {
   return json(
     {
       short_name: `SOTD`,

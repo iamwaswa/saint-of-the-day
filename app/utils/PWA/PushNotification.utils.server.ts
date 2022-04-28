@@ -11,12 +11,10 @@ interface PushObject {
   silent?: boolean;
 }
 
-export async function SaveSubscription(sub: PushSubscription): Promise<void> {
-  await storage.init();
-  await storage.setItem("subscription", sub);
-}
-
-export async function PushNotification(content: PushObject, delay: number = 0) {
+export async function pushNotificationAsync(
+  content: PushObject,
+  delay: number = 0
+) {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
     console.log(
       "You must set the VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY " +

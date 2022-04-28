@@ -1,16 +1,16 @@
 // Send a client notification to the user
 
-interface NotificationOptions {
+interface INotificationOptions {
   body: string | `Notification body`;
   badge?: string;
   icon?: string;
   image?: string;
-  silent: boolean | false;
+  silent: boolean;
 }
 
 export async function sendNotificationAsync(
   title: string,
-  options: NotificationOptions
+  options: INotificationOptions
 ) {
   try {
     if (`Notification` in window) {
