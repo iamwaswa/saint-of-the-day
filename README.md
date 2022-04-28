@@ -12,7 +12,7 @@ npx create-remix --template remix-run/indie-stack
 
 - [Fly app deployment](https://fly.io) with [Docker](https://www.docker.com/)
 - Healthcheck endpoint for [Fly backups region fallbacks](https://fly.io/docs/reference/configuration/#services-http_checks)
-- [GitHub Actions](https://github.com/features/actions) for deploy on merge to production and staging environments
+- [GitHub Actions](https://github.com/features/actions) for deploy on merge to production environment
 - Styling with [Tailwind](https://tailwindcss.com/)
 - End-to-end testing with [Cypress](https://cypress.io)
 - Local third party request mocking with [MSW](https://mswjs.io)
@@ -41,7 +41,7 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 ## Deployment
 
-This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and staging environments.
+This Remix Stack comes with two GitHub Actions that handle automatically deploying your app to production and environment.
 
 Prior to your first deployment, you'll need to do a few things:
 
@@ -55,11 +55,10 @@ Prior to your first deployment, you'll need to do a few things:
 
   > **Note:** If you have more than one Fly account, ensure that you are signed into the same account in the Fly CLI as you are in the browser. In your terminal, run `fly auth whoami` and ensure the email matches the Fly account signed into the browser.
 
-- Create two apps on Fly, one for staging and one for production:
+- Create an app on Fly for production:
 
   ```sh
   fly create saint-of-the-day
-  fly create saint-of-the-day-staging
   ```
 
   - Initialize Git.
@@ -76,7 +75,7 @@ Prior to your first deployment, you'll need to do a few things:
 
 - Add a `FLY_API_TOKEN` to your GitHub repo. To do this, go to your user settings on Fly and create a new [token](https://web.fly.io/user/personal_access_tokens/new), then add it to [your repo secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) with the name `FLY_API_TOKEN`.
 
-Now that everything is set up you can commit and push your changes to your repo. Every commit to your `main` branch will trigger a deployment to your production environment, and every commit to your `dev` branch will trigger a deployment to your staging environment.
+Now that everything is set up you can commit and push your changes to your repo. Every commit to your `main` branch will trigger a deployment to your production environment.
 
 ### Getting Help with Deployment
 
@@ -84,7 +83,7 @@ If you run into any issues deploying to Fly, make sure you've followed all of th
 
 ## GitHub Actions
 
-We use GitHub Actions for continuous integration and deployment. Anything that gets into the `main` branch will be deployed to production after running tests/build/etc. Anything in the `dev` branch will be deployed to staging.
+We use GitHub Actions for continuous integration and deployment. Anything that gets into the `main` branch will be deployed to production after running tests/build/etc.
 
 ## Testing
 
