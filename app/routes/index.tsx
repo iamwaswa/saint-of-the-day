@@ -125,7 +125,7 @@ export default function IndexPage() {
           className={`aspect-[${loaderData.saintOfTheDay.imageProperties.width}/${loaderData.saintOfTheDay.imageProperties.height}] w-full rounded-sm`}
           src={loaderData.saintOfTheDay.imageProperties.src}
         />
-        <p className="text-center text-lg">
+        <p className="text-center text-lg" title="introduction">
           {loaderData.saintOfTheDay.introduction}
         </p>
         <a
