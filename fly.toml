@@ -1,4 +1,4 @@
-app = "saint-of-the-day-86f0"
+app = "saint-of-the-day"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = [ ]
