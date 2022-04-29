@@ -52,7 +52,7 @@ RUN apt-get update \
   libxcursor1 libxdamage1 libxext6 libxfixes3 \
   libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
   ca-certificates fonts-liberation libappindicator1 \
-  libnss3 lsb-release xdg-utils wget libgobject-2.0.so.0
+  libnss3 lsb-release xdg-utils wget libgobject-2.0
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
