@@ -29,7 +29,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   let response: Response | undefined = undefined;
 
   const browser = await Scraper.launch({
-    headless: process.env.NODE_ENV !== `development`,
+    headless: false,
   });
   const page = await browser.newPage();
   await page.goto(`https://www.catholic.org/saints/sofd.php`);
