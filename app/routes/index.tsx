@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/server-runtime";
-import { json } from "@remix-run/server-runtime";
+import { json, redirect } from "@remix-run/server-runtime";
 import { strings } from "~/localization";
 import { parseDOMFromHtmlString, serverFetch } from "~/packages";
 import { getIsDarkModeSessionAsync, RenderEitherOr } from "~/utils";
@@ -18,15 +18,12 @@ export const action: ActionFunction = async ({ request }) => {
 
     isDarkModeSession.set(isDarkMode?.toLowerCase() === `true`);
 
-    return json(
-      {},
-      {
-        headers: { [`Set-Cookie`]: await isDarkModeSession.commitAsync() },
-      }
-    );
+    return redirect(`/`, {
+      headers: { [`Set-Cookie`]: await isDarkModeSession.commitAsync() },
+    });
   }
 
-  return json({});
+  return redirect(`/`);
 };
 
 interface ISaintOfTheDay {
@@ -165,6 +162,7 @@ export default function IndexPage() {
           href={loaderData.saintOfTheDay.readMoreLink}
           rel="noopener noreferrer"
           target="_blank"
+          title="Read more"
         >
           {strings.readMoreActionText}
         </a>
@@ -179,7 +177,7 @@ interface IToggleThemeProps {
 
 function ToggleTheme({ isDarkMode }: IToggleThemeProps) {
   return (
-    <Form method="post" reloadDocument={true} replace={true}>
+    <Form method="post" replace={true}>
       <input
         defaultValue={String(!isDarkMode)}
         name="isDarkMode"

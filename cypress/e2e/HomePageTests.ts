@@ -34,7 +34,7 @@ describe(`Home Page Tests`, () => {
   });
 
   it(`should have an external link without tracking with the text "Read More"`, () => {
-    cy.findByRole(`link`)
+    cy.findAllByTitle(`Read more`)
       .should(`be.visible`)
       .should(`have.attr`, `target`, `_blank`)
       .should(`have.attr`, `rel`, `noopener noreferrer`)
