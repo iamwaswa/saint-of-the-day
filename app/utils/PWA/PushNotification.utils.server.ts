@@ -23,6 +23,8 @@ export async function pushNotificationAsync(content: IPushNotificationContent) {
 
   const pushSubscription = await fileSystemDatabase.getItem(`subscription`);
 
+  console.log({ pushSubscription });
+
   webPush
     .sendNotification(pushSubscription, JSON.stringify(content))
     .then(() => {
