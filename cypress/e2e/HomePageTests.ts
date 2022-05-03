@@ -4,7 +4,7 @@ describe(`Home Page Tests`, () => {
   });
 
   it(`should be in light mode by default`, () => {
-    cy.get(`html`).should(`have.attr`, `class`, `h-full`);
+    cy.get(`html`).should(`have.attr`, `class`, `min-h-full`);
   });
 
   it(`should have a toggle dark mode action`, () => {
@@ -12,9 +12,9 @@ describe(`Home Page Tests`, () => {
   });
 
   it(`should toggle to dark mode when dark mode action is clicked`, () => {
-    cy.get(`html`).should(`have.attr`, `class`, `h-full`);
+    cy.get(`html`).should(`have.attr`, `class`, `min-h-full`);
     cy.get(`button[role='switch']`).click();
-    cy.get(`html`).should(`have.attr`, `class`, `dark h-full`);
+    cy.get(`html`).should(`have.attr`, `class`, `dark min-h-full`);
   });
 
   it(`should have a title "Saint Of The Day"`, () => {

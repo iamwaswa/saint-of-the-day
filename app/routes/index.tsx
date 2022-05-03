@@ -179,7 +179,7 @@ interface IToggleThemeProps {
 
 function ToggleTheme({ isDarkMode }: IToggleThemeProps) {
   return (
-    <Form method="post" replace={true}>
+    <Form method="post" reloadDocument={true} replace={true}>
       <input
         defaultValue={String(!isDarkMode)}
         name="isDarkMode"
