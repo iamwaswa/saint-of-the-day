@@ -2,6 +2,7 @@ node_modules
 
 *.http
 /.cache
+/.node-persist/**/*
 /build
 /public/build
 /public/entry.worker.js

@@ -231,21 +231,53 @@ async function handleMessageAsync(event: ExtendableMessageEvent) {
  */
 
 self.addEventListener(`push`, function (event) {
-  // Retrieve the textual payload from event.data (a PushMessageData object).
-  // Other formats are supported (ArrayBuffer, Blob, JSON), check out the documentation
-  // on https://developer.mozilla.org/en-US/docs/Web/API/PushMessageData.
-  const payload = event.data?.json() ?? { body: ``, title: `No Payload` };
+  debug(`self.addEventListener(push)`);
 
-  console.log(`self.addEventListener(push)`, { payload });
+  // Only allow push notifications if the user has granted permission
+  // to display notifications
+  if (window.Notification && window.Notification.permission === `granted`) {
+    // Retrieve the textual payload from event.data (a PushMessageData object).
+    // Other formats are supported (ArrayBuffer, Blob, JSON), check out the documentation
+    // on https://developer.mozilla.org/en-US/docs/Web/API/PushMessageData.
+    const payload = event.data?.json() ?? { body: ``, title: `No Payload` };
 
-  // Keep the service worker alive until the notification is created.
-  event.waitUntil(
-    // Show a notification with the payload as the title
-    self.registration.showNotification(payload.title, {
-      body: payload.body,
-    })
-  );
+    debug(`self.addEventListener(push)`, { payload });
+
+    // Keep the service worker alive until the notification is created.
+    event.waitUntil(
+      // Show a notification
+      handleNotificationAsync(payload)
+    );
+  }
 });
+
+interface INotificationPayload {
+  body: string;
+  title: string;
+}
+
+async function handleNotificationAsync(
+  payload: INotificationPayload
+): Promise<void> {
+  if (`Notification` in window && navigator.serviceWorker) {
+    if (
+      Notification.permission !== `granted` &&
+      Notification.permission !== `denied`
+    ) {
+      await Notification.requestPermission().then((status) => {
+        debug(`Notification permission request status`, status);
+      });
+    }
+
+    if (Notification.permission === `granted`) {
+      self.registration.showNotification(payload.title, {
+        body: payload.body,
+        icon: `/icons/favicon-196x196.png`,
+        vibrate: [100, 50, 100, 50, 100],
+      });
+    }
+  }
+}
 
 function debug(...messages: any[]) {
   if (process.env.NODE_ENV === `development`) {

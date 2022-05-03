@@ -27,28 +27,39 @@ if (`serviceWorker` in navigator) {
         });
       }
 
-      const pushSubscription = await registration.pushManager.getSubscription();
+      if (`Notification` in window) {
+        const notificationPermission = await Notification.requestPermission();
 
-      // If there is no subscription create one.
-      if (!pushSubscription) {
-        // Get the server's public key
-        const vapidPublicKey = await fetch(`/vapidPublicKey`).then(
-          (response) => {
-            return response.text();
-          }
-        );
-
-        // Chrome doesn't accept the base64-encoded (string) vapidPublicKey yet
-        const convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey);
-
-        // Otherwise, subscribe the user
-        // (userVisibleOnly allows to specify that we don't plan to
-        // send notifications that don't have a visible effect for the user).
-        await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: convertedVapidPublicKey,
-        });
+        if (notificationPermission !== `granted`) {
+          return;
+        }
+      } else {
+        return;
       }
+
+      // Get the server's public key
+      const vapidPublicKey = await fetch(`/vapidPublicKey`).then((response) => {
+        return response.text();
+      });
+
+      // Chrome doesn't accept the base64-encoded (string) vapidPublicKey yet
+      const convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey);
+
+      // Otherwise, subscribe the user
+      // (userVisibleOnly allows to specify that we don't plan to
+      // send notifications that don't have a visible effect for the user).
+      const pushSubscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: convertedVapidPublicKey,
+      });
+
+      fetch(`/persistPushSubscription`, {
+        headers: {
+          [`Content-Type`]: `application/json`,
+        },
+        body: JSON.stringify(pushSubscription),
+        method: `POST`,
+      });
     } catch (error: unknown) {
       console.error(`Service worker registration failed`, error);
     }

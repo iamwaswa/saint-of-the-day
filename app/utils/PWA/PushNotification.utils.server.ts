@@ -1,14 +1,10 @@
-import storage from "node-persist";
-import webPush from "web-push";
+import { fileSystemDatabase, webPush } from "~/packages";
 
 interface IPushNotificationContent extends NotificationOptions {
   title: string;
 }
 
-export async function pushNotificationAsync(
-  content: IPushNotificationContent,
-  delay: number = 0
-) {
+export async function pushNotificationAsync(content: IPushNotificationContent) {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
     console.log(
       `You must set the VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables. You can use the following ones:`
@@ -23,23 +19,21 @@ export async function pushNotificationAsync(
     process.env.VAPID_PRIVATE_KEY
   );
 
-  await storage.init();
+  await fileSystemDatabase.init();
 
-  const subscription = await storage.getItem(`subscription`);
+  const pushSubscription = await fileSystemDatabase.getItem(`subscription`);
 
-  setTimeout(() => {
-    webPush
-      .sendNotification(subscription, JSON.stringify(content))
-      .then(() => {
-        return new Response(`success`, {
-          status: 200,
-        });
-      })
-      .catch((e: unknown) => {
-        console.log(e);
-        return new Response(`Failed!`, {
-          status: 500,
-        });
+  webPush
+    .sendNotification(pushSubscription, JSON.stringify(content))
+    .then(() => {
+      return new Response(`success`, {
+        status: 200,
       });
-  }, delay * 1000);
+    })
+    .catch((e: unknown) => {
+      console.log(e);
+      return new Response(`Failed!`, {
+        status: 500,
+      });
+    });
 }

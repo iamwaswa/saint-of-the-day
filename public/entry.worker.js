@@ -162,11 +162,29 @@ async function handleMessageAsync(event) {
 }
 self.addEventListener(`push`, function(event) {
   var _a, _b;
-  const payload = (_b = (_a = event.data) == null ? void 0 : _a.json()) != null ? _b : { body: ``, title: `No Payload` };
-  event.waitUntil(self.registration.showNotification(payload.title, {
-    body: payload.body
-  }));
+  debug(`self.addEventListener(push)`);
+  if (window.Notification && window.Notification.permission === `granted`) {
+    const payload = (_b = (_a = event.data) == null ? void 0 : _a.json()) != null ? _b : { body: ``, title: `No Payload` };
+    debug(`self.addEventListener(push)`, { payload });
+    event.waitUntil(handleNotificationAsync(payload));
+  }
 });
+async function handleNotificationAsync(payload) {
+  if (`Notification` in window && navigator.serviceWorker) {
+    if (Notification.permission !== `granted` && Notification.permission !== `denied`) {
+      await Notification.requestPermission().then((status) => {
+        debug(`Notification permission request status`, status);
+      });
+    }
+    if (Notification.permission === `granted`) {
+      self.registration.showNotification(payload.title, {
+        body: payload.body,
+        icon: `/icons/favicon-196x196.png`,
+        vibrate: [100, 50, 100, 50, 100]
+      });
+    }
+  }
+}
 function debug(...messages) {
   if (true) {
     console.debug(...messages);
