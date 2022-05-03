@@ -13,10 +13,14 @@ export const loader: LoaderFunction = async ({ request }) => {
       if (!r.ok) return Promise.reject(r);
     });
 
-    await pushNotificationAsync({
-      body: `There is a new saint of the day!`,
-      title: `Saint Of The Day`,
-    });
+    const date = new Date();
+
+    if (date.getHours() === 23 && date.getMinutes() === 59) {
+      await pushNotificationAsync({
+        body: `There is a new saint of the day!`,
+        title: `Saint Of The Day`,
+      });
+    }
 
     return new Response(`OK`);
   } catch (error: unknown) {
