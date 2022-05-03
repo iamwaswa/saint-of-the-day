@@ -18,7 +18,7 @@
     "generate:css": "tailwindcss -o ./app/styles/tailwind.css",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve build",
-    "start:mocks": "binode --require ./mocks -- @remix-run/serve:remix-serve build",
+    "start:mocks": "cross-env SESSION_SECRET=mocks binode --require ./mocks -- @remix-run/serve:remix-serve build",
     "test": "cross-env SESSION_SECRET=testing vitest",
     "test:e2e:dev": "cross-env SESSION_SECRET=testing start-server-and-test dev http://localhost:3000 \"cypress open\"",
     "pretest:e2e:run": "npm run build",
