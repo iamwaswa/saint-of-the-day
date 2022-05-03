@@ -1,1 +1,2 @@
-export * from "./Scraper";
+export * from "./DomParser";
+export * from "./ServerFetch";

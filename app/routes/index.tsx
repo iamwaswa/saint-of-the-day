@@ -3,7 +3,7 @@ import type { LoaderFunction, MetaFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
 import { useEffect } from "react";
 import { strings } from "~/localization";
-import { Scraper } from "~/packages";
+import { parseDOMFromHtmlString, serverFetch } from "~/packages";
 import { sendNotificationAsync } from "~/utils";
 
 interface ISaintOfTheDay {
@@ -15,9 +15,7 @@ interface ISaintOfTheDay {
 type WithImageProperties<TypeWithoutImageProperties> =
   TypeWithoutImageProperties & {
     imageProperties: {
-      height: number;
       src: string;
-      width: number;
     };
   };
 
@@ -26,79 +24,83 @@ interface IIndexPageLoaderData {
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  let response: Response | undefined = undefined;
+  const baseURL = `https://www.catholic.org`;
 
-  const browser = await Scraper.launch({
-    headless: process.env.NODE_ENV !== `development`,
+  const page = await serverFetch(`${baseURL}/saints/sofd.php`, {
+    headers: {
+      [`Content-Type`]: `text/html`,
+    },
   });
-  const page = await browser.newPage();
-  await page.goto(`https://www.catholic.org/saints/sofd.php`);
-  const linksToContinueReading = await page.$x(
-    `//a[contains(., 'continue reading')]`
-  );
 
-  if (linksToContinueReading.length > 0) {
-    const [firstLinkToContinueReading] = linksToContinueReading;
-    const linkToSaintOfTheDayFullInfo = await (
-      await firstLinkToContinueReading.getProperty(`href`)
-    ).jsonValue<string>();
-    await page.goto(linkToSaintOfTheDayFullInfo);
+  const html = await page.text();
 
-    const readMoreAction = await page.$(`#wikiReadMore`);
+  const document = parseDOMFromHtmlString(html);
 
-    if (readMoreAction) {
-      await readMoreAction.click();
+  const container = document.getElementById(`saintsSofd`);
 
-      const name = await page.$eval(`h1`, (element) => {
-        if (element instanceof HTMLHeadingElement) {
-          return element.textContent;
-        }
-      });
+  const links = container?.getElementsByTagName(`a`);
 
-      const imageProperties = await page.$eval(
-        `#saintContent > img`,
-        (element) => {
-          if (element instanceof HTMLImageElement) {
-            const boundingClientRect = element.getBoundingClientRect();
+  if (links && links.length > 0) {
+    const [fullContentLink] = links;
 
-            return {
-              height: Math.round(boundingClientRect.height),
-              src: element.src,
-              width: Math.round(boundingClientRect.width),
-            };
+    const fullContentURL = fullContentLink.getAttribute(`href`);
+
+    if (fullContentURL) {
+      const readMoreLink = `${baseURL}${fullContentURL}`;
+
+      const fullPage = await serverFetch(readMoreLink);
+
+      const fullHtml = await fullPage.text();
+
+      const fullDocument = parseDOMFromHtmlString(fullHtml);
+
+      const titleElements = fullDocument.getElementsByTagName(`h1`);
+
+      if (titleElements && titleElements.length > 0) {
+        const [titleElement] = titleElements;
+        const name = titleElement.textContent;
+
+        const saintContent = fullDocument.getElementById(`saintContent`);
+
+        if (saintContent) {
+          const images = saintContent.getElementsByTagName(`img`);
+
+          if (images && images.length > 0) {
+            const [image] = images;
+
+            const src = image.getAttribute(`data-src`);
+
+            if (src) {
+              const imageProperties = {
+                src: `${baseURL}${src}`,
+              };
+
+              const saintContentText = saintContent.getElementsByTagName(`p`);
+
+              if (saintContentText && saintContentText.length > 0) {
+                const [paragraph] = saintContentText;
+                const introduction = paragraph.textContent;
+
+                return json<IIndexPageLoaderData>({
+                  saintOfTheDay: {
+                    imageProperties,
+                    introduction,
+                    name,
+                    readMoreLink,
+                  },
+                });
+              }
+            }
           }
         }
-      );
-
-      const introduction = await page.$eval(`#saintContent > p`, (element) => {
-        return element.textContent;
-      });
-
-      if (imageProperties && introduction && name) {
-        const saintOfTheDay = {
-          imageProperties,
-          introduction,
-          name,
-          readMoreLink: linkToSaintOfTheDayFullInfo,
-        };
-
-        response = json<IIndexPageLoaderData>({
-          saintOfTheDay,
-        });
       }
     }
   }
 
-  await browser.close();
-
-  if (!response) {
-    throw new Response(strings.internalServerErrorTitle, {
-      status: 500,
-      statusText: strings.internalServerErrorMessage,
-    });
-  }
-
-  return response;
+  throw new Response(strings.internalServerErrorTitle, {
+    status: 500,
+    statusText: strings.internalServerErrorMessage,
+  });
 };
 
 export const meta: MetaFunction = () => ({
@@ -124,7 +126,7 @@ export default function IndexPage() {
         </h1>
         <img
           alt={loaderData.saintOfTheDay.name}
-          className={`aspect-[${loaderData.saintOfTheDay.imageProperties.width}/${loaderData.saintOfTheDay.imageProperties.height}] w-full rounded-sm`}
+          className="aspect-auto w-full rounded-sm object-cover"
           src={loaderData.saintOfTheDay.imageProperties.src}
         />
         <p className="text-center text-lg" title="introduction">
