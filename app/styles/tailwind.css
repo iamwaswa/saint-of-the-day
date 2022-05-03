@@ -515,8 +515,16 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-right: auto;
 }
 
+.mt-96 {
+  margin-top: 24rem;
+}
+
 .mt-4 {
   margin-top: 1rem;
+}
+
+.block {
+  display: block;
 }
 
 .flex {
@@ -529,10 +537,6 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .aspect-auto {
   aspect-ratio: auto;
-}
-
-.h-full {
-  height: 100%;
 }
 
 .h-\[40px\] {
