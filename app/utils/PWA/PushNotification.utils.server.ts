@@ -1,5 +1,5 @@
-const storage = require("node-persist");
-const webPush = require("web-push");
+import storage from "node-persist";
+import webPush from "web-push";
 
 interface IPushNotificationContent extends NotificationOptions {
   title: string;
