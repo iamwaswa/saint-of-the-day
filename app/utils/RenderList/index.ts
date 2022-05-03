@@ -1,1 +1,1 @@
-export * from "./RenderList.utils.test";
+export * from "./RenderList.utils";

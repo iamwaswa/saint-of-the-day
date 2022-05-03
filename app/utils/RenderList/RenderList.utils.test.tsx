@@ -1,35 +1,36 @@
-import { Component } from "react";
-import type { ReactNode } from "react";
+import { RenderList } from "./RenderList.utils";
+import { render, screen } from "@testing-library/react";
 
-interface IRenderListProps<DataType> {
-  items: Array<DataType>;
-  renderNoContent?: ReactNode | (() => ReactNode);
-  renderItem(item: DataType, index: number, items: Array<DataType>): ReactNode;
-}
+describe(`RenderList`, () => {
+  it(`correctly renders a list of items`, () => {
+    const numberOfItems = 10;
+    const items = Array(numberOfItems)
+      .fill(null)
+      .map((_: null, index: number) => index);
 
-/**
- * Renders a list of items
- */
-export class RenderList<DataType> extends Component<
-  IRenderListProps<DataType>
-> {
-  private renderListItem = (
-    item: DataType,
-    index: number,
-    array: Array<DataType>
-  ): ReactNode => {
-    return this.props.renderItem(item, index, array);
-  };
+    render(
+      <RenderList
+        items={items}
+        renderItem={(item) => <div key={item}>{item}</div>}
+      />
+    );
 
-  render(): ReactNode {
-    const { items, renderNoContent = <></> } = this.props;
+    items.forEach((item) => {
+      expect(screen.getByText(item)).toBeInstanceOf(HTMLDivElement);
+    });
+  });
 
-    if (items.length === 0) {
-      return typeof renderNoContent === `function`
-        ? renderNoContent()
-        : renderNoContent;
-    }
+  it(`correctly renders no content`, () => {
+    const noContentText = `No Content`;
 
-    return items.map(this.renderListItem);
-  }
-}
+    render(
+      <RenderList
+        items={[]}
+        renderItem={(item) => <div key={item}>{item}</div>}
+        renderNoContent={<div>{noContentText}</div>}
+      />
+    );
+
+    expect(screen.getByText(noContentText)).toBeInstanceOf(HTMLDivElement);
+  });
+});
