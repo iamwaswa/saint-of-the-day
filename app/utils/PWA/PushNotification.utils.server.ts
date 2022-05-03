@@ -13,20 +13,19 @@ export async function pushNotificationAsync(content: IPushNotificationContent) {
     return;
   }
 
-  webPush.setVapidDetails(
-    `https://serviceworke.rs/`,
-    process.env.VAPID_PUBLIC_KEY,
-    process.env.VAPID_PRIVATE_KEY
-  );
-
   await fileSystemDatabase.init();
 
   const pushSubscription = await fileSystemDatabase.getItem(`subscription`);
 
-  console.log({ pushSubscription });
-
   webPush
-    .sendNotification(pushSubscription, JSON.stringify(content))
+    .sendNotification(pushSubscription, JSON.stringify(content), {
+      TTL: 60,
+      vapidDetails: {
+        privateKey: process.env.VAPID_PRIVATE_KEY,
+        publicKey: process.env.VAPID_PUBLIC_KEY,
+        subject: `https://serviceworke.rs/`,
+      },
+    })
     .then(() => {
       return new Response(`success`, {
         status: 200,
