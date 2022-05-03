@@ -226,6 +226,25 @@ async function handleMessageAsync(event: ExtendableMessageEvent) {
   await Promise.all(cachePromises.values());
 }
 
+/**
+ * Push
+ */
+
+self.addEventListener(`push`, function (event) {
+  // Retrieve the textual payload from event.data (a PushMessageData object).
+  // Other formats are supported (ArrayBuffer, Blob, JSON), check out the documentation
+  // on https://developer.mozilla.org/en-US/docs/Web/API/PushMessageData.
+  const payload = event.data?.json() ?? { body: ``, title: `No Payload` };
+
+  // Keep the service worker alive until the notification is created.
+  event.waitUntil(
+    // Show a notification with the payload as the title
+    self.registration.showNotification(payload.title, {
+      body: payload.body,
+    })
+  );
+});
+
 function debug(...messages: any[]) {
   if (process.env.NODE_ENV === `development`) {
     console.debug(...messages);

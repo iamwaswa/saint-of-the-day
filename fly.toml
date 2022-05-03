@@ -36,10 +36,10 @@ processes = [ ]
     timeout = "2s"
 
   [[services.http_checks]]
-    interval = 10_000
+    interval = 86_400_000
     grace_period = "5s"
     method = "get"
-    path = "/healthcheck"
+    path = "/notification"
     protocol = "http"
     timeout = 2_000
     tls_skip_verify = false

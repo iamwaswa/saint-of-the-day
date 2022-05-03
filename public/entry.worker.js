@@ -160,6 +160,13 @@ async function handleMessageAsync(event) {
   }
   await Promise.all(cachePromises.values());
 }
+self.addEventListener(`push`, function(event) {
+  var _a, _b;
+  const payload = (_b = (_a = event.data) == null ? void 0 : _a.json()) != null ? _b : { body: ``, title: `No Payload` };
+  event.waitUntil(self.registration.showNotification(payload.title, {
+    body: payload.body
+  }));
+});
 function debug(...messages) {
   if (true) {
     console.debug(...messages);

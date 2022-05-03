@@ -1,4 +1,4 @@
-import { RenderList } from "./RenderList.utils";
+import { RenderList } from "./RenderList.utils.test";
 import { render, screen } from "@testing-library/react";
 
 describe(`RenderList`, () => {

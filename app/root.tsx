@@ -1,5 +1,11 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type {
+  LinksFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { ThrownResponse } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { useLocation, useMatches } from "@remix-run/react";
 import {
   Links,
@@ -13,6 +19,7 @@ import {
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import tailwindStylesheetUrl from "./styles/tailwind.css";
+import { getIsDarkModeSessionAsync } from "./utils";
 
 export const links: LinksFunction = () => {
   return [
@@ -90,6 +97,18 @@ export const links: LinksFunction = () => {
   ];
 };
 
+interface IRootRouteLoaderData {
+  isDarkMode: boolean;
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const isDarkModeSession = await getIsDarkModeSessionAsync(request);
+
+  return json<IRootRouteLoaderData>({
+    isDarkMode: Boolean(isDarkModeSession.get()),
+  });
+};
+
 export const meta: MetaFunction = () => ({
   charset: `utf-8`,
   [`theme-color`]: `#ffffff`,
@@ -97,7 +116,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function App() {
-  return <Document body={<Outlet />} />;
+  const loaderData = useLoaderData<IRootRouteLoaderData>();
+  return <Document body={<Outlet />} isDarkMode={loaderData.isDarkMode} />;
 }
 
 export function CatchBoundary() {
@@ -137,19 +157,20 @@ export function ErrorBoundary({ error }: IErrorBoundaryProps) {
 interface IDocumentProps {
   body: ReactNode;
   head?: ReactNode;
+  isDarkMode?: boolean;
 }
 
-function Document({ body, head }: IDocumentProps) {
+function Document({ body, head, isDarkMode }: IDocumentProps) {
   useSetupServiceWorker();
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`${isDarkMode ? `dark ` : ``}h-full`}>
       <head>
         <Meta />
         <Links />
         {head}
       </head>
-      <body className="h-full">
+      <body className="h-full bg-slate-50 dark:bg-slate-800">
         {body}
         <ScrollRestoration />
         <Scripts />

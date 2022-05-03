@@ -1,5 +1,10 @@
 interface ILocalizationStrings {
   /*
+   * The title for dark mode
+   */
+  darkModeTitle: string;
+
+  /*
    * The description for the home page
    */
   homePageDescription: string;

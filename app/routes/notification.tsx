@@ -1,5 +1,6 @@
 // learn more: https://fly.io/docs/reference/configuration/#services-http_checks
 import type { LoaderFunction } from "@remix-run/node";
+import { pushNotificationAsync } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const host =
@@ -11,6 +12,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     await fetch(url.toString(), { method: `HEAD` }).then((r) => {
       if (!r.ok) return Promise.reject(r);
     });
+
+    await pushNotificationAsync({
+      body: `There is a new saint of the day!`,
+      title: `Saint Of The Day`,
+    });
+
     return new Response(`OK`);
   } catch (error: unknown) {
     console.log(`healthcheck ❌`, { error });
