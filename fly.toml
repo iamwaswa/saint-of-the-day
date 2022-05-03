@@ -36,7 +36,7 @@ processes = [ ]
     timeout = "2s"
 
   [[services.http_checks]]
-    interval = 86_400_000
+    interval = 10_000
     grace_period = "5s"
     method = "get"
     path = "/notification"
