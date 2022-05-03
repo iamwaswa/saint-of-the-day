@@ -3,6 +3,20 @@ describe(`Home Page Tests`, () => {
     cy.visit(`/`);
   });
 
+  it(`should be in light mode by default`, () => {
+    cy.get(`html`).should(`have.attr`, `class`, `h-full`);
+  });
+
+  it(`should have a toggle dark mode action`, () => {
+    cy.get(`button[role='switch']`).should(`be.visible`);
+  });
+
+  it(`should toggle to dark mode when dark mode action is clicked`, () => {
+    cy.get(`html`).should(`have.attr`, `class`, `h-full`);
+    cy.get(`button[role='switch']`).click();
+    cy.get(`html`).should(`have.attr`, `class`, `dark h-full`);
+  });
+
   it(`should have a title "Saint Of The Day"`, () => {
     cy.title().should(`eq`, `Saint Of The Day`);
   });
