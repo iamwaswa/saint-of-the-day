@@ -13,12 +13,12 @@ export const loader: LoaderFunction = async ({ request }) => {
       if (!r.ok) return Promise.reject(r);
     });
 
-    // if (isJustAfterMidnight()) {
-    await pushNotificationAsync({
-      body: `It's a new day. Have a look at the Saint for today!`,
-      title: `Saint Of The Day`,
-    });
-    // }
+    if (isJustAfterMidnight()) {
+      await pushNotificationAsync({
+        body: `It's a new day. Have a look at the Saint for today!`,
+        title: `Saint Of The Day`,
+      });
+    }
 
     return new Response(`OK`);
   } catch (error: unknown) {
