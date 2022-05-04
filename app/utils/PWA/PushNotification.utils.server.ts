@@ -27,7 +27,6 @@ export async function pushNotificationAsync(content: IPushNotificationContent) {
   webPush
     .sendNotification(pushSubscription, JSON.stringify(content), {
       gcmAPIKey: process.env.GCM_API_KEY,
-      TTL: 60,
       vapidDetails: {
         privateKey: process.env.VAPID_PRIVATE_KEY,
         publicKey: process.env.VAPID_PUBLIC_KEY,

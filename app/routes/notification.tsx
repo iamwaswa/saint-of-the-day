@@ -13,14 +13,12 @@ export const loader: LoaderFunction = async ({ request }) => {
       if (!r.ok) return Promise.reject(r);
     });
 
-    const date = new Date();
-
-    if (date.getHours() === 23 && date.getMinutes() === 59) {
-      await pushNotificationAsync({
-        body: `There is a new saint of the day!`,
-        title: `Saint Of The Day`,
-      });
-    }
+    // if (isJustAfterMidnight()) {
+    await pushNotificationAsync({
+      body: `It's a new day. Have a look at the Saint for today!`,
+      title: `Saint Of The Day`,
+    });
+    // }
 
     return new Response(`OK`);
   } catch (error: unknown) {
@@ -28,3 +26,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     return new Response(`ERROR`, { status: 500 });
   }
 };
+
+function isJustAfterMidnight(): boolean {
+  const date = new Date();
+  return date.getHours() === 0 && date.getMinutes() === 1;
+}
