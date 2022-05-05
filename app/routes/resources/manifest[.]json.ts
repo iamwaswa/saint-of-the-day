@@ -1,10 +1,16 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { getIsDarkModeSessionAsync } from "~/utils";
 
-export const loader: LoaderFunction = () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  const isDarkModeSession = await getIsDarkModeSessionAsync(request);
+  const isDarkMode = Boolean(isDarkModeSession.get());
+  const background_color = isDarkMode ? `#1e293b` : `#f8fafc`;
+  const theme_color = isDarkMode ? `#f8fafc` : `#1e293b`;
+
   return json(
     {
-      background_color: `#ffffff`,
+      background_color,
       description: `Wanna know your saints? We have you covered, get to know the saint of the day on the Saint Of The Day App!`,
       display: `fullscreen`,
       icons: [
@@ -51,7 +57,7 @@ export const loader: LoaderFunction = () => {
       ],
       short_name: `SOTD`,
       start_url: `/`,
-      theme_color: `#000000`,
+      theme_color,
     },
     {
       headers: {
